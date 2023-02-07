@@ -1,22 +1,25 @@
-import { ethers } from "hardhat";
+import { ethers, run, network } from 'hardhat';
+import '@nomiclabs/hardhat-etherscan';
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-  const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS;
+  const Community = await ethers.getContractFactory('Community');
+  const community = await Community.deploy();
+  await community.deployed();
+  const deployedTransaction = await community.deployTransaction;
+  await deployedTransaction.wait(6);
 
-  const lockedAmount = ethers.utils.parseEther("1");
+  console.log(`community deployed at ${community.address}`);
 
-  const Lock = await ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
-
-  await lock.deployed();
-
-  console.log(`Lock with 1 ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`);
+  //verify on etherscan only if it uses the network with chainid 5. wait 6 block confirmations before verifying
+  if (network.config.chainId === 5) {
+    await run('verify:verify', {
+      address: community.address,
+      contract: 'contracts/Community.sol:Community',
+      constructorArgs: [],
+    });
+  }
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
 main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
