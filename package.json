@@ -22,6 +22,7 @@
     "hardhat-deploy-ethers": "^0.3.0-beta.13",
     "hardhat-gas-reporter": "^1.0.8",
     "mocha": "^10.2.0",
+    "solhint": "^3.3.8",
     "solidity-coverage": "^0.8.0",
     "ts-node": "^10.9.1",
     "typechain": "^8.1.0",
